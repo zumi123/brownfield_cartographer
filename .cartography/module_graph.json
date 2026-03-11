@@ -1,0 +1,196 @@
+{
+  "nodes": [
+    {
+      "id": "src/orchestrator.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/agents/hydrologist.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/agents/surveyor.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/graph/knowledge_graph.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/cli.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/__init__.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/analyzers/tree_sitter_analyzer.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/models/schema.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/agents/__init__.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/analyzers/dag_config_parser.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/analyzers/sql_lineage.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/graph/__init__.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/analyzers/__init__.py",
+      "language": "python",
+      "pagerank": 0.071429
+    },
+    {
+      "id": "src/models/__init__.py",
+      "language": "python",
+      "pagerank": 0.071429
+    }
+  ],
+  "edges": [
+    {
+      "source": "src/orchestrator.py",
+      "target": "src/agents/hydrologist.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/orchestrator.py",
+      "target": "src/agents/surveyor.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/orchestrator.py",
+      "target": "src/graph/knowledge_graph.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/hydrologist.py",
+      "target": "src/analyzers/dag_config_parser.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/hydrologist.py",
+      "target": "src/analyzers/sql_lineage.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/hydrologist.py",
+      "target": "src/graph/knowledge_graph.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/surveyor.py",
+      "target": "src/analyzers/tree_sitter_analyzer.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/surveyor.py",
+      "target": "src/graph/knowledge_graph.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/surveyor.py",
+      "target": "src/models/schema.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/graph/knowledge_graph.py",
+      "target": "src/models/schema.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/cli.py",
+      "target": "src/orchestrator.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/__init__.py",
+      "target": "src/agents/hydrologist.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/__init__.py",
+      "target": "src/agents/surveyor.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/analyzers/dag_config_parser.py",
+      "target": "src/models/schema.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/analyzers/sql_lineage.py",
+      "target": "src/models/schema.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/graph/__init__.py",
+      "target": "src/graph/knowledge_graph.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/analyzers/__init__.py",
+      "target": "src/analyzers/dag_config_parser.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/analyzers/__init__.py",
+      "target": "src/analyzers/sql_lineage.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/analyzers/__init__.py",
+      "target": "src/analyzers/tree_sitter_analyzer.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/models/__init__.py",
+      "target": "src/models/schema.py",
+      "type": "IMPORTS",
+      "weight": 1
+    }
+  ]
+}

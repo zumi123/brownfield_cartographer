@@ -1,0 +1,37 @@
+{
+  "nodes": [
+    {
+      "id": "sample_lineage/models/sample.sql",
+      "kind": "transformation",
+      "source_datasets": [
+        "raw.customers",
+        "raw.orders"
+      ],
+      "target_datasets": [],
+      "transformation_type": "sql",
+      "source_file": "sample_lineage/models/sample.sql",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "raw.customers",
+      "kind": "dataset"
+    },
+    {
+      "id": "raw.orders",
+      "kind": "dataset"
+    }
+  ],
+  "edges": [
+    {
+      "source": "raw.customers",
+      "target": "sample_lineage/models/sample.sql",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "raw.orders",
+      "target": "sample_lineage/models/sample.sql",
+      "type": "CONSUMES"
+    }
+  ]
+}
