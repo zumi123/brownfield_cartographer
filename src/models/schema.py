@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 # --- Node types (per challenge spec) ---
@@ -20,6 +20,13 @@ class ModuleNode(BaseModel):
     change_velocity_30d: Optional[int] = None
     is_dead_code_candidate: bool = False
     last_modified: Optional[str] = None
+
+    @field_validator("path")
+    @classmethod
+    def path_non_empty(cls, v: str) -> str:
+        if not (v and v.strip()):
+            raise ValueError("path must be non-empty")
+        return v
 
 
 class StorageType(str, Enum):
@@ -61,6 +68,13 @@ class TransformationNode(BaseModel):
     source_file: str = ""
     line_range: Optional[tuple[int, int]] = None
     sql_query_if_applicable: Optional[str] = None
+
+    @field_validator("id")
+    @classmethod
+    def id_non_empty(cls, v: str) -> str:
+        if not (v and v.strip()):
+            raise ValueError("id must be non-empty")
+        return v
 
 
 # --- Edge types ---

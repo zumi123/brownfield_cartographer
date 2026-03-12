@@ -3,72 +3,107 @@
     {
       "id": "src/orchestrator.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false
     },
     {
       "id": "src/agents/hydrologist.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false
     },
     {
       "id": "src/agents/surveyor.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false
     },
     {
       "id": "src/graph/knowledge_graph.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false
     },
     {
       "id": "src/cli.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": true
     },
     {
       "id": "src/__init__.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false
     },
     {
       "id": "src/analyzers/tree_sitter_analyzer.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false
     },
     {
       "id": "src/models/schema.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false
     },
     {
       "id": "src/agents/__init__.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": true
     },
     {
       "id": "src/analyzers/dag_config_parser.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false
+    },
+    {
+      "id": "src/analyzers/python_data_flow.py",
+      "language": "python",
+      "pagerank": 0.066667,
+      "change_velocity_30d": 0,
+      "is_dead_code_candidate": false
     },
     {
       "id": "src/analyzers/sql_lineage.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false
     },
     {
       "id": "src/graph/__init__.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": true
     },
     {
       "id": "src/analyzers/__init__.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": true
     },
     {
       "id": "src/models/__init__.py",
       "language": "python",
-      "pagerank": 0.071429
+      "pagerank": 0.066667,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": true
     }
   ],
   "edges": [
@@ -93,6 +128,12 @@
     {
       "source": "src/agents/hydrologist.py",
       "target": "src/analyzers/dag_config_parser.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/hydrologist.py",
+      "target": "src/analyzers/python_data_flow.py",
       "type": "IMPORTS",
       "weight": 1
     },
@@ -157,6 +198,12 @@
       "weight": 1
     },
     {
+      "source": "src/analyzers/python_data_flow.py",
+      "target": "src/models/schema.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
       "source": "src/analyzers/sql_lineage.py",
       "target": "src/models/schema.py",
       "type": "IMPORTS",
@@ -171,6 +218,12 @@
     {
       "source": "src/analyzers/__init__.py",
       "target": "src/analyzers/dag_config_parser.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/analyzers/__init__.py",
+      "target": "src/analyzers/python_data_flow.py",
       "type": "IMPORTS",
       "weight": 1
     },
@@ -192,5 +245,17 @@
       "type": "IMPORTS",
       "weight": 1
     }
+  ],
+  "high_velocity_files": [
+    "src/orchestrator.py",
+    "src/agents/hydrologist.py",
+    "src/agents/surveyor.py",
+    "src/graph/knowledge_graph.py",
+    "src/cli.py",
+    "src/__init__.py",
+    "src/analyzers/tree_sitter_analyzer.py",
+    "src/models/schema.py",
+    "src/agents/__init__.py",
+    "src/analyzers/dag_config_parser.py"
   ]
 }

@@ -1,0 +1,28 @@
+%% Architecture: Four-agent pipeline (Brownfield Cartographer)
+%% Render: GitHub, VS Code, or: npx @mermaid-js/mermaid-cli mmdc -i docs/architecture.mmd -o docs/architecture.png
+
+flowchart TB
+    IN["INPUT: target codebase (path | GitHub URL)"]
+    CLI["CLI\nsrc/cli.py"]
+    ORCH["Orchestrator\nsrc/orchestrator.py"]
+    S["Agent 1: Surveyor\nsrc/agents/surveyor.py"]
+    H["Agent 2: Hydrologist\nsrc/agents/hydrologist.py"]
+    KG["Knowledge Graph (central)\nsrc/graph/knowledge_graph.py"]
+    SEM["Agent 3: Semanticist (planned)"]
+    ARCH["Agent 4: Archivist (planned)"]
+
+    IN --> CLI
+    CLI -->|repo_path| ORCH
+    ORCH -->|repo_path| S
+    ORCH -->|repo_path| H
+    S -->|ModuleNodes + import graph edges| KG
+    H -->|TransformationNodes + lineage edges| KG
+    SEM -.->|Purpose Statements| KG
+    KG -.->|read KG| ARCH
+    KG --> M["module_graph.json"]
+    KG --> L["lineage_graph.json"]
+    ARCH -.-> C["CODEBASE.md"]
+    ARCH -.-> O["onboarding_brief.md"]
+    ARCH -.-> T["cartography_trace.jsonl"]
+
+    style KG fill:#e1f5ff

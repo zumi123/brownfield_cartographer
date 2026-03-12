@@ -61,13 +61,15 @@ class KnowledgeGraph:
             return []
 
     def to_module_graph_dict(self) -> Dict[str, List]:
-        """JSON-serializable module graph with optional pagerank."""
+        """JSON-serializable module graph with pagerank and analytical metadata."""
         pr = self.pagerank_modules()
         nodes = [
             {
                 "id": n,
                 "language": self.module_graph.nodes[n].get("language"),
                 "pagerank": round(pr.get(n, 0.0), 6),
+                "change_velocity_30d": self.module_graph.nodes[n].get("change_velocity_30d"),
+                "is_dead_code_candidate": self.module_graph.nodes[n].get("is_dead_code_candidate", False),
             }
             for n in self.module_graph.nodes
         ]
@@ -75,7 +77,29 @@ class KnowledgeGraph:
             {"source": u, "target": v, "type": EdgeTypes.IMPORTS.value, "weight": self.module_graph.edges[u, v].get("weight", 1)}
             for u, v in self.module_graph.edges
         ]
-        return {"nodes": nodes, "edges": edges}
+        # Top high-velocity files (descending by change_velocity_30d); at least top 10 or top 20%
+        velocity_list = [(n, self.module_graph.nodes[n].get("change_velocity_30d") or 0) for n in self.module_graph.nodes]
+        velocity_list.sort(key=lambda x: -x[1])
+        k = min(len(velocity_list), max(10, (len(velocity_list) + 4) // 5))
+        high_velocity = [path for path, _ in velocity_list[:k]]
+        return {"nodes": nodes, "edges": edges, "high_velocity_files": high_velocity}
+
+    def from_module_graph_dict(self, data: Dict[str, Any]) -> None:
+        """Deserialize module graph from JSON-compatible dict (shared service read)."""
+        self.module_graph.clear()
+        for node in data.get("nodes") or []:
+            nid = node.get("id") or node.get("path")
+            if nid:
+                self.module_graph.add_node(
+                    nid,
+                    language=node.get("language", "python"),
+                    change_velocity_30d=node.get("change_velocity_30d"),
+                    is_dead_code_candidate=node.get("is_dead_code_candidate", False),
+                )
+        for edge in data.get("edges") or []:
+            u, v = edge.get("source"), edge.get("target")
+            if u and v:
+                self.module_graph.add_edge(u, v, weight=edge.get("weight", 1))
 
     # --- Lineage graph (Hydrologist) ---
 
@@ -100,6 +124,27 @@ class KnowledgeGraph:
                 return []
             return list(nx.ancestors(self.lineage_graph, node_id))
 
+    def blast_radius_with_paths(self, node_id: str, direction: str = "downstream") -> List[tuple[str, List[str]]]:
+        """Like blast_radius but returns (node_id, path_from_start) for each reachable node (BFS path)."""
+        if not self.lineage_graph.has_node(node_id):
+            return []
+        out: List[tuple[str, List[str]]] = []
+        if direction == "downstream":
+            for succ in nx.descendants(self.lineage_graph, node_id):
+                try:
+                    path = nx.shortest_path(self.lineage_graph, node_id, succ)
+                    out.append((succ, path))
+                except (nx.NetworkXNoPath, nx.NodeNotFound):
+                    pass
+        else:
+            for pred in nx.ancestors(self.lineage_graph, node_id):
+                try:
+                    path = nx.shortest_path(self.lineage_graph, pred, node_id)
+                    out.append((pred, path))
+                except (nx.NetworkXNoPath, nx.NodeNotFound):
+                    pass
+        return out
+
     def find_sources(self) -> List[str]:
         """Nodes with in-degree 0 (entry points)."""
         return [n for n in self.lineage_graph.nodes if self.lineage_graph.in_degree(n) == 0]
@@ -121,3 +166,20 @@ class KnowledgeGraph:
             for u, v in self.lineage_graph.edges
         ]
         return {"nodes": nodes, "edges": edges}
+
+    def from_lineage_graph_dict(self, data: Dict[str, Any]) -> None:
+        """Deserialize lineage graph from JSON-compatible dict (shared service read)."""
+        self.lineage_graph.clear()
+        self._transformation_nodes.clear()
+        for node in data.get("nodes") or []:
+            nid = node.get("id")
+            if not nid:
+                continue
+            attrs = {k: v for k, v in node.items() if k != "id"}
+            if attrs.get("line_range") and isinstance(attrs["line_range"], list):
+                attrs["line_range"] = tuple(attrs["line_range"]) if len(attrs["line_range"]) >= 2 else None
+            self.lineage_graph.add_node(nid, **attrs)
+        for edge in data.get("edges") or []:
+            u, v = edge.get("source"), edge.get("target")
+            if u and v and self.lineage_graph.has_node(u) and self.lineage_graph.has_node(v):
+                self.lineage_graph.add_edge(u, v, type=edge.get("type", "PRODUCES"))

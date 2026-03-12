@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 import pathlib
 from typing import Any, Iterator, Tuple
 
 from tree_sitter import Language, Node, Parser, Tree
+
+log = logging.getLogger(__name__)
 
 
 class LanguageRouter:
@@ -42,7 +45,7 @@ class TreeSitterAnalyzer:
         self.router = LanguageRouter()
 
     def parse_file(self, path: pathlib.Path) -> Tuple[str, Tree, bytes] | None:
-        """Return (language_name, tree, source_bytes) or None if not supported."""
+        """Return (language_name, tree, source_bytes) or None if not supported/unparseable."""
         lang_info = self.router.for_path(path)
         if not lang_info:
             return None
@@ -51,9 +54,13 @@ class TreeSitterAnalyzer:
             source = path.read_bytes()
         except OSError:
             return None
-        parser = Parser(language)
-        tree = parser.parse(source)
-        return lang_name, tree, source
+        try:
+            parser = Parser(language)
+            tree = parser.parse(source)
+            return lang_name, tree, source
+        except Exception as e:
+            log.debug("Parse failed for %s: %s", path, e)
+            return None
 
     def extract_python_imports(self, path: pathlib.Path) -> list[tuple[str, bool]]:
         """(module_name, is_relative) from import/from statements. Relative = from .x.y."""

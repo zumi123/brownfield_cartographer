@@ -2,6 +2,34 @@
 
 Codebase intelligence system for brownfield data engineering and analytics repositories. Ingests a local path or GitHub URL and produces a **system map** (module import graph) and **data lineage graph** (from SQL and YAML config).
 
+### Architecture (four-agent pipeline)
+
+```mermaid
+flowchart TB
+    IN["INPUT: target codebase (path | GitHub URL)"]
+    CLI["CLI - src/cli.py"]
+    ORCH["Orchestrator - src/orchestrator.py"]
+    S["Agent 1: Surveyor"]
+    H["Agent 2: Hydrologist"]
+    KG["Knowledge Graph (central)"]
+    SEM["Agent 3: Semanticist (planned)"]
+    ARCH["Agent 4: Archivist (planned)"]
+    IN --> CLI --> ORCH
+    ORCH --> S
+    ORCH --> H
+    S -->|ModuleNodes + import graph| KG
+    H -->|TransformationNodes + lineage| KG
+    SEM -.->|Purpose Statements| KG
+    KG -.-> ARCH
+    KG --> M["module_graph.json"]
+    KG --> L["lineage_graph.json"]
+    ARCH -.-> C["CODEBASE.md"]
+    ARCH -.-> O["onboarding_brief.md"]
+    style KG fill:#e1f5ff
+```
+
+Full diagram with labels: see [docs/architecture.mmd](docs/architecture.mmd).
+
 ### Installation
 
 **With pip:**

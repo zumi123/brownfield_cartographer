@@ -30,14 +30,15 @@ def _ensure_local_repo(target: pathlib.Path, branch: Optional[str] = None) -> pa
     raise ValueError(f"Target {target} is not a directory and not a recognized GitHub URL.")
 
 
-def run_analyze(target: pathlib.Path, branch: Optional[str] = None) -> None:
+def run_analyze(target: pathlib.Path, branch: Optional[str] = None, output_dir: Optional[pathlib.Path] = None) -> None:
     """
-    Run Surveyor then Hydrologist; write .cartography/module_graph.json and
-    .cartography/lineage_graph.json inside the repo.
+    Run Surveyor then Hydrologist; write module_graph.json and lineage_graph.json.
+    output_dir: default is <repo>/.cartography
     """
     repo_path = _ensure_local_repo(target, branch=branch)
-    cartography_dir = repo_path / ".cartography"
-    cartography_dir.mkdir(exist_ok=True)
+    cartography_dir = output_dir if output_dir is not None else repo_path / ".cartography"
+    cartography_dir = pathlib.Path(cartography_dir)
+    cartography_dir.mkdir(parents=True, exist_ok=True)
 
     kg = KnowledgeGraph()
 

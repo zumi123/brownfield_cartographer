@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+import re
 import pathlib
 from typing import Any
 
@@ -9,6 +11,8 @@ import sqlglot
 from sqlglot import exp
 
 from ..models.schema import TransformationNode
+
+log = logging.getLogger(__name__)
 
 
 class SQLLineageAnalyzer:
@@ -67,8 +71,10 @@ class SQLLineageAnalyzer:
                             if targets:
                                 sources.add(name)
                             else:
-                                # SELECT-only: treat as both source and "output" for lineage
                                 sources.add(name)
+                    # dbt ref() in same file (basic pattern)
+                    for ref_name in self._extract_ref_calls(source):
+                        sources.add(ref_name)
 
                     if not targets and sources:
                         # CTE-based or SELECT: use last/most specific as logical target
@@ -94,7 +100,8 @@ class SQLLineageAnalyzer:
                         )
                     )
                 break  # one dialect succeeded
-            except Exception:
+            except Exception as e:
+                log.debug("SQL parse failed for %s with dialect %s: %s", rel_path, dialect, e)
                 continue
 
         if not nodes:
@@ -107,6 +114,9 @@ class SQLLineageAnalyzer:
                         n = self._table_name(table)
                         if n:
                             all_tables.add(n)
+                # Basic dbt ref() pattern: ref('model_name') or ref("model_name")
+                for ref_name in self._extract_ref_calls(source):
+                    all_tables.add(ref_name)
                 if all_tables:
                     nodes.append(
                         TransformationNode(
@@ -117,10 +127,17 @@ class SQLLineageAnalyzer:
                             source_file=rel_path,
                         )
                     )
-            except Exception:
-                pass
+            except Exception as e:
+                log.warning("SQL parse fallback failed for %s: %s", rel_path, e)
 
         return nodes
+
+    def _extract_ref_calls(self, source: str) -> list[str]:
+        """Extract dbt ref() targets from raw SQL (Jinja not rendered)."""
+        refs: list[str] = []
+        for m in re.finditer(r"ref\s*\(\s*['\"]([^'\"]+)['\"]\s*\)", source, re.IGNORECASE):
+            refs.append(m.group(1))
+        return refs
 
     def _table_name(self, table: exp.Table | Any) -> str | None:
         if not isinstance(table, exp.Table):

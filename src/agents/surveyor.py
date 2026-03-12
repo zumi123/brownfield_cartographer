@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import logging
 import pathlib
-from typing import Iterable, Set
+from typing import Set
 
 from git import Repo
 
 from ..analyzers.tree_sitter_analyzer import TreeSitterAnalyzer
 from ..graph.knowledge_graph import KnowledgeGraph
 from ..models.schema import ModuleNode
+
+log = logging.getLogger(__name__)
 
 
 class Surveyor:
@@ -24,23 +27,24 @@ class Surveyor:
         self.analyzer = TreeSitterAnalyzer(self.repo_root)
 
     def run(self) -> None:
-        # Collect all modules and imports
         all_modules: Set[str] = set()
         for path in self.analyzer.iter_python_files():
-            rel = str(path.relative_to(self.repo_root))
-            self.kg.add_module(path=rel, language="python")
-            all_modules.add(rel)
-            for mod_name, is_relative in self.analyzer.extract_python_imports(path):
-                target_rel = self._resolve_import_to_path(rel, mod_name, is_relative)
-                if target_rel:
-                    self.kg.add_module(path=target_rel, language="python")
-                    self.kg.add_import_edge(rel, target_rel)
-                    all_modules.add(target_rel)
+            try:
+                rel = str(path.relative_to(self.repo_root))
+                self.kg.add_module(path=rel, language="python")
+                all_modules.add(rel)
+                for mod_name, is_relative in self.analyzer.extract_python_imports(path):
+                    target_rel = self._resolve_import_to_path(rel, mod_name, is_relative)
+                    if target_rel:
+                        self.kg.add_module(path=target_rel, language="python")
+                        self.kg.add_import_edge(rel, target_rel)
+                        all_modules.add(target_rel)
+            except Exception as e:
+                log.warning("Surveyor skipped %s: %s", path, e)
+                continue
 
-        # Git velocity (change count in last 30 days)
         self._attach_git_velocity()
 
-        # Dead code candidates: modules that are never imported
         referenced = set()
         for u, v in self.kg.module_graph.edges:
             referenced.add(v)

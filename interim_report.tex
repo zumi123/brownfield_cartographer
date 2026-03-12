@@ -1,0 +1,245 @@
+% Interim Report — The Brownfield Cartographer
+% Compile: pdflatex interim_report.tex
+% Or: latexmk -pdf interim_report.tex
+
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{fancyvrb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\geometry{margin=2.5cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+}
+
+\title{\textbf{Interim Report — The Brownfield Cartographer}}
+\author{10 Academy Training — Week 4}
+\date{Interim: Thursday March 12, 03:00 UTC}
+
+\begin{document}
+\maketitle
+
+\textbf{Submission:} Interim — Thursday March 12, 03:00 UTC.\\
+\textbf{Target:} This repository (brownfield\_cartographer) as primary; optional second target: dbt jaffle\_shop or mitodl/ol-data-platform.
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+%=============================================================================
+\section{RECONNAISSANCE — Manual Day-One Analysis}
+%=============================================================================
+
+\textbf{Target:} This repository (brownfield\_cartographer) — interim primary target.\\
+\textbf{Date:} March 2025 (interim submission).\\
+\textbf{Time spent:} $\sim$30 minutes manual exploration.
+
+\subsection{1. What is the primary data ingestion path?}
+
+This repo is the Cartographer tool itself, not a data platform. Observed \textbf{data flow}: the target codebase (local path or GitHub URL) \textbf{enters via} \texttt{src/cli.py} as the single argument; \textbf{lands in} \texttt{src/orchestrator.py} where \texttt{\_ensure\_local\_repo()} resolves it to a local directory; that path is then \textbf{consumed by} \texttt{src/agents/surveyor.py} (which discovers \texttt{*.py} under the repo and parses them via \texttt{src/analyzers/tree\_sitter\_analyzer.py}) and \texttt{src/agents/hydrologist.py} (which scans \texttt{*.sql} and \texttt{*.yml} via \texttt{sql\_lineage.py} and \texttt{dag\_config\_parser.py}). Git history is read by the Surveyor for change velocity. So the primary ``ingestion path'' is: \textbf{\texttt{src/cli.py} $\rightarrow$ \texttt{src/orchestrator.py} $\rightarrow$ \texttt{run\_analyze()} $\rightarrow$ file discovery $\rightarrow$ AST/config parsing} (Surveyor and Hydrologist).
+
+\subsection{2. What are the 3--5 most critical output datasets/endpoints?}
+
+\begin{enumerate}[noitemsep]
+  \item \texttt{.cartography/module\_graph.json} — produced by the orchestrator from the knowledge graph after the Surveyor runs; contains module (file) nodes and import edges; used for PageRank, dead-code candidates, structural overview.
+  \item \texttt{.cartography/lineage\_graph.json} — produced after the Hydrologist runs; dataset and transformation nodes from SQL and YAML; used for lineage and blast-radius queries.
+  \item (Planned) \texttt{CODEBASE.md}, \texttt{onboarding\_brief.md}, semantic index, \texttt{cartography\_trace.jsonl}.
+\end{enumerate}
+Observed \textbf{critical path} in code: \texttt{src/cli.py} calls \texttt{run\_analyze()} in \texttt{src/orchestrator.py}; orchestrator calls \texttt{Surveyor.run()} then \texttt{Hydrologist.run()}, then writes the two JSONs to \texttt{.cartography/}.
+
+\subsection{3. What is the blast radius if the most critical module fails?}
+
+\begin{itemize}[noitemsep]
+  \item \textbf{\texttt{src/orchestrator.py}}: No analysis runs; \texttt{src/cli.py} calls \texttt{run\_analyze()} only from here. \textbf{Blast radius: entire pipeline.}
+  \item \textbf{\texttt{src/graph/knowledge\_graph.py}}: Both \texttt{src/agents/surveyor.py} and \texttt{src/agents/hydrologist.py} import it; no module or lineage graph can be built or serialized. \textbf{Blast radius: full pipeline.}
+  \item \textbf{\texttt{src/agents/surveyor.py}} or \textbf{\texttt{src/agents/hydrologist.py}}: Only that agent's output is missing; the other still runs. \textbf{Blast radius: one agent's outputs.}
+\end{itemize}
+
+\subsection{4. Where is the business logic concentrated vs.\ distributed?}
+
+\textbf{Concentrated} (specific modules):
+\begin{itemize}[noitemsep]
+  \item \texttt{src/graph/knowledge\_graph.py} — module graph, lineage graph, PageRank, \texttt{blast\_radius()}, \texttt{find\_sources()}/\texttt{find\_sinks()}.
+  \item \texttt{src/orchestrator.py} — wiring Surveyor $\rightarrow$ Hydrologist and writing \texttt{module\_graph.json}, \texttt{lineage\_graph.json}.
+\end{itemize}
+
+\textbf{Distributed} (observed data flow patterns):
+\begin{itemize}[noitemsep]
+  \item Parsing: \texttt{src/analyzers/tree\_sitter\_analyzer.py} (AST, imports), \texttt{src/analyzers/sql\_lineage.py} (SQL tables), \texttt{src/analyzers/dag\_config\_parser.py} (YAML/dbt/Airflow). Each analyzer is used by one agent.
+  \item \texttt{src/agents/surveyor.py} and \texttt{src/agents/hydrologist.py} are thin: they call analyzers and feed \texttt{KnowledgeGraph}; no business logic outside the graph and orchestrator.
+\end{itemize}
+
+\subsection{5. What has changed most frequently in the last 90 days (git velocity)?}
+
+\textbf{High velocity} (by inspection of a newly built repo): \texttt{src/orchestrator.py}, \texttt{src/agents/surveyor.py}, \texttt{src/agents/hydrologist.py}, \texttt{src/graph/knowledge\_graph.py}, \texttt{src/analyzers/*.py} — core pipeline and analyzers.\\
+\textbf{Lower velocity:} \texttt{src/models/schema.py}, \texttt{src/cli.py}, \texttt{README.md}.\\
+The Surveyor's \texttt{\_attach\_git\_velocity()} attaches commit counts per file to the module graph (e.g.\ last 30 days); this is implemented but depends on a valid git repo.
+
+\subsection{Difficulty analysis: concrete pain points and Cartographer priorities}
+
+\begin{itemize}
+  \item \textbf{Import structure:} Manually tracing which files depend on which (e.g.\ \texttt{src/orchestrator.py} imports \texttt{src/agents/surveyor.py}, \texttt{src/agents/hydrologist.py}, \texttt{src/graph/knowledge\_graph}) required opening several files and resolving relative imports (e.g.\ \texttt{..analyzers.tree\_sitter\_analyzer}). \textbf{Priority:} The Cartographer must resolve relative imports and produce a single module graph with labeled edges so that structural overview and blast radius are automatic.
+  \item \textbf{Lineage:} For \texttt{sample\_lineage/models/sample.sql}, confirming that \texttt{raw.customers} and \texttt{raw.orders} are the upstream sources was trivial by eye; in a large dbt/Airflow repo this would be painful. \textbf{Priority:} The Cartographer must extract table-level dependencies from SQL and config so that ``what produces/consumes table X'' is queryable without reading every file.
+  \item \textbf{Blast radius:} Reasoning about ``if \texttt{src/orchestrator.py} breaks, what fails'' required mental traversal of call sites. \textbf{Priority:} The Cartographer's \texttt{blast\_radius()} and the module/lineage graphs should answer this with a single query.
+\end{itemize}
+
+\subsection{Where did I get lost?}
+
+The boundary between ``data platform'' and ``tool that analyzes code'' had to be clarified: this repo is the latter, so Day-One answers are framed as inputs/outputs of the tool (e.g.\ ``data enters via \texttt{src/cli.py}'' rather than ``raw data lands in staging'').
+
+\subsection{Ground truth for interim validation}
+
+Module graph: all \texttt{src/**/*.py} (excluding venv) and edges for internal imports (e.g.\ \texttt{src/orchestrator.py} $\rightarrow$ \texttt{src/agents/surveyor.py}, \texttt{src/agents/hydrologist.py}, \texttt{src/graph/knowledge\_graph.py}). Lineage graph: at least one transformation from \texttt{sample\_lineage/models/sample.sql} with sources \texttt{raw.customers} and \texttt{raw.orders}. PageRank and dead-code candidates as implemented.
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+%=============================================================================
+\section{Architecture diagram — four-agent pipeline (data flow)}
+%=============================================================================
+
+\textbf{System input:} Target codebase (local path or GitHub URL). \textbf{Output artifacts:} \texttt{module\_graph.json}, \texttt{lineage\_graph.json}, and (planned) \texttt{CODEBASE.md}, \texttt{onboarding\_brief.md}, \texttt{cartography\_trace.jsonl}, semantic index. The knowledge graph is the central store; all agents read/write it. Labeled edges indicate what passes between components.
+
+The diagram is maintained in Mermaid format in the repo (\texttt{docs/architecture.mmd}) for readability and version control. It renders on GitHub, in VS Code, and in any Mermaid-capable viewer. For the PDF, either view the repo on GitHub or export the diagram to PNG (e.g.\ \texttt{npx @mermaid-js/mermaid-cli mmdc -i docs/architecture.mmd -o docs/architecture.png}) and uncomment the line below.
+
+% \includegraphics[width=\textwidth]{docs/architecture.png}
+
+\begin{Verbatim}[fontsize=\footnotesize]
+flowchart TB
+  IN --> CLI --> ORCH --> S & H --> KG --> module_graph.json, lineage_graph.json
+  S -->|ModuleNodes + import graph| KG    H -->|TransformationNodes + lineage| KG
+  Semanticist (planned) -->|Purpose Statements| KG
+  Archivist (planned) <--|read KG| KG --> CODEBASE.md, onboarding_brief.md, trace
+\end{Verbatim}
+
+Data flow (internally consistent): CLI passes repo path to Orchestrator. Orchestrator creates KnowledgeGraph, runs Surveyor (writes ModuleNodes and IMPORTS edges), then Hydrologist (writes TransformationNodes and CONSUMES/PRODUCES edges), then serializes module\_graph and lineage\_graph to \texttt{.cartography/}. Planned: Semanticist writes Purpose Statements into KG; Archivist reads KG and writes CODEBASE.md, onboarding\_brief.md, trace.
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+%=============================================================================
+\section{Progress summary — component status}
+%=============================================================================
+
+Per-component status with sub-capability detail. Covers all interim-relevant components. Honest about what does not work yet.
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{CLI entry point (\texttt{src/cli.py}):} Accepts local path or GitHub URL; invokes \texttt{run\_analyze()}. \textbf{Works.} Sub-option for branch when cloning not yet exercised in interim.
+  \item \textbf{Pydantic models (\texttt{src/models/schema.py}):} ModuleNode, DatasetNode, FunctionNode, TransformationNode, EdgeTypes, StorageType defined. \textbf{Works.} Used by knowledge graph and Hydrologist; not all fields (e.g.\ purpose\_statement, domain\_cluster) populated yet because Semanticist not implemented.
+  \item \textbf{Tree-sitter analyzer (\texttt{src/analyzers/tree\_sitter\_analyzer.py}):} LanguageRouter for Python, SQL, YAML; \texttt{parse\_file()}; \texttt{extract\_python\_imports()} with relative-import resolution (including \texttt{..}); \texttt{extract\_python\_public\_symbols()}. \textbf{Python parsing and import extraction work.} SQL/YAML parsing not used for structural graph in interim (only Hydrologist uses SQL/YAML for lineage).
+  \item \textbf{SQL lineage analyzer (\texttt{src/analyzers/sql\_lineage.py}):} sqlglot-based; extracts table dependencies from SELECT/FROM/JOIN; multiple dialects; fallback for plain SELECTs. \textbf{Works} for the sample \texttt{sample\_lineage/models/sample.sql}. \textbf{Does not work:} dbt \texttt{ref()} and Jinja templating not parsed; SELECT-only statements do not get a target dataset node in current fallback.
+  \item \textbf{DAG config parser (\texttt{src/analyzers/dag\_config\_parser.py}):} YAML load; dbt schema.yml and Airflow-style task parsing; emits TransformationNodes. \textbf{Implemented} but no dbt/Airflow YAML in current target repo, so not exercised in interim artifacts.
+  \item \textbf{Surveyor agent (\texttt{src/agents/surveyor.py}):} Tree-sitter Python parsing \textbf{functional}; import graph \textbf{built} (relative and absolute); PageRank \textbf{runs} (with uniform fallback if numpy/scipy missing); dead-code candidates \textbf{computed}. Git velocity \textbf{integrated} (\texttt{\_attach\_git\_velocity()}) but depends on valid git repo and may be zero for a fresh clone.
+  \item \textbf{Hydrologist agent (\texttt{src/agents/hydrologist.py}):} DataLineageGraph from SQL and YAML \textbf{works}; \texttt{blast\_radius()}, \texttt{find\_sources()}, \texttt{find\_sinks()} \textbf{implemented}. Python data-flow (pandas, PySpark, SQLAlchemy) \textbf{not yet implemented}.
+  \item \textbf{Graph serialization (\texttt{src/graph/knowledge\_graph.py}):} \texttt{to\_module\_graph\_dict()} and \texttt{to\_lineage\_graph\_dict()} \textbf{work}; JSON written to \texttt{.cartography/}. Strongly connected components (circular deps) computed but not yet written to artifacts.
+  \item \textbf{Artifact output:} \texttt{module\_graph.json} and \texttt{lineage\_graph.json} \textbf{produced} for at least one target (this repo). \texttt{CODEBASE.md}, \texttt{onboarding\_brief.md}, \texttt{cartography\_trace.jsonl} \textbf{not yet produced} (Archivist not implemented).
+\end{itemize}
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+%=============================================================================
+\section{Early accuracy observations}
+%=============================================================================
+
+Both the module graph and the lineage graph (partial) are assessed against the target codebase (this repo). Observations are grounded in named files or relationships.
+
+\subsection{Module graph — correct structural detections}
+
+\begin{itemize}
+  \item \textbf{Correct:} \texttt{src/orchestrator.py} is correctly shown importing \texttt{src/agents/surveyor.py}, \texttt{src/agents/hydrologist.py}, and \texttt{src/graph/knowledge\_graph.py}; edges match the actual \texttt{from .agents.surveyor import Surveyor} etc.\ in the source.
+  \item \textbf{Correct:} \texttt{src/cli.py} $\rightarrow$ \texttt{src/orchestrator.py} is present (single entry point).
+  \item \textbf{Correct:} \texttt{src/agents/surveyor.py} correctly shows outgoing edges to \texttt{src/analyzers/tree\_sitter\_analyzer.py}, \texttt{src/graph/knowledge\_graph.py}, \texttt{src/models/schema.py} (relative imports \texttt{..analyzers}, \texttt{..graph}, \texttt{..models} resolved).
+  \item \textbf{Correct:} All \texttt{src/**/*.py} files (excluding venv) appear as nodes; \texttt{src/analyzers/\_\_init\_\_.py} $\rightarrow$ dag\_config\_parser, sql\_lineage, tree\_sitter\_analyzer and \texttt{src/models/\_\_init\_\_.py} $\rightarrow$ \texttt{src/models/schema.py} are captured.
+\end{itemize}
+
+\subsection{Module graph — inaccuracies / limitations}
+
+\begin{itemize}
+  \item \textbf{Third-party imports:} Imports of standard library or installed packages (e.g.\ \texttt{pathlib}, \texttt{typer}, \texttt{sqlglot}) are not resolved to repo paths (correctly); they do not appear as graph nodes. No inaccuracy — by design.
+  \item \textbf{PageRank:} If numpy/scipy are missing, PageRank is a uniform distribution over nodes, so ``architectural hub'' identification is not meaningful. Cause: dependency on optional numerical stack.
+\end{itemize}
+
+\subsection{Lineage graph — correct detections}
+
+\begin{itemize}
+  \item \textbf{Correct:} For \texttt{sample\_lineage/models/sample.sql}, the graph correctly captures that the transformation \textbf{consumes} \texttt{raw.customers} and \texttt{raw.orders} (FROM/JOIN in the SQL). CONSUMES edges from those dataset nodes to the transformation node are present. This matches the observed SQL content.
+\end{itemize}
+
+\subsection{Lineage graph — inaccuracies with likely cause}
+
+\begin{itemize}
+  \item \textbf{No target dataset for SELECT-only:} The same \texttt{sample\_lineage/models/sample.sql} is a pure SELECT (no INSERT/CREATE); the current sqlglot fallback does not assign a logical output (e.g.\ a derived table or ``query result'') as the target of the transformation. So the transformation node has \texttt{source\_datasets} but \texttt{target\_datasets} is empty. \textbf{Likely cause:} Fallback path in \texttt{sql\_lineage.py} only collects source tables and does not create a synthetic target for SELECT-only statements.
+  \item \textbf{dbt \texttt{ref()} not resolved:} If a model used \texttt{ref('staging\_table')}, we would not resolve it to the actual table name; we rely on raw table names from sqlglot. \textbf{Cause:} dbt Jinja templating is not yet parsed; \texttt{ref()} is a runtime construct.
+\end{itemize}
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+%=============================================================================
+\section{Completion plan for final submission}
+%=============================================================================
+
+\subsection{Gaps (current state)}
+
+Semanticist, Archivist, and Navigator agents not implemented. Python data-flow extraction in Hydrologist not implemented. Incremental update (git diff) not implemented. Second target codebase not yet run and documented. dbt \texttt{ref()} and SELECT-only target in lineage are limitations.
+
+\subsection{Sequenced plan with dependencies}
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Semanticist (LLM purpose statements, doc drift, domain clustering, Day-One answers).} Depends on: module graph and lineage graph (read-only). Produces: purpose statements per module, doc-drift flags, domain labels, answers to five Day-One questions. Feeds: Archivist and Navigator.
+  \item \textbf{Archivist (CODEBASE.md, onboarding\_brief.md, cartography\_trace.jsonl).} Depends on: KnowledgeGraph (full) and Semanticist output (purpose statements, Day-One answers). Produces: \texttt{CODEBASE.md}, \texttt{onboarding\_brief.md}, \texttt{cartography\_trace.jsonl}. No other component depends on Archivist for core pipeline; Navigator can read artifacts.
+  \item \textbf{Navigator (query interface: find\_implementation, trace\_lineage, blast\_radius, explain\_module).} Depends on: KnowledgeGraph (read), and optionally Archivist artifacts for richer context. Implements the four tools with file:line citations.
+  \item \textbf{Python data-flow in Hydrologist (pandas, PySpark, SQLAlchemy).} Depends on: tree-sitter Python parsing (existing). Adds extraction of read/write targets from Python AST. Independent of Semanticist/Archivist/Navigator.
+  \item \textbf{Incremental update (re-analyze only changed files).} Depends on: git diff and previous \texttt{.cartography/} state. Can be done after the full pipeline is stable.
+  \item \textbf{Second target (jaffle\_shop or ol-data-platform).} Run Cartographer, compare to manual RECON, document accuracy. Depends on: stable CLI and artifact format.
+\end{enumerate}
+
+\subsection{Critical path vs.\ stretch goals}
+
+\textbf{Critical path} (required for final rubric): (1) Semanticist with purpose statements and Day-One answers; (2) Archivist with \texttt{CODEBASE.md} and \texttt{onboarding\_brief.md}; (3) Navigator with at least \texttt{trace\_lineage} and \texttt{blast\_radius} (and ideally \texttt{find\_implementation}, \texttt{explain\_module}); (4) Cartography artifacts for two target codebases; (5) Final PDF report and video demo.
+
+\textbf{Stretch:} Python data-flow extraction in Hydrologist; incremental update; domain clustering quality; full dbt \texttt{ref()} resolution; semantic index with vector search.
+
+\subsection{Technical risks and uncertainties}
+
+\begin{itemize}
+  \item \textbf{LLM prompt design for purpose statements} will require iteration; quality (vs.\ docstring regurgitation) is uncertain until tested on real modules. Mitigation: use code-only context (no docstring in prompt) and a cheap model for bulk; validate on a few hand-labeled modules.
+  \item \textbf{Domain clustering quality} (k-means on purpose-statement embeddings) is hard to predict before testing; cluster labels may be noisy. Mitigation: treat as best-effort; prioritize Day-One answers and CODEBASE.md over perfect clusters.
+  \item \textbf{Navigator tool integration} (LangGraph + four tools) has integration risk (token limits, citation format). Mitigation: implement one tool first (e.g.\ \texttt{trace\_lineage}), then add the rest.
+\end{itemize}
+
+\subsection{Fallback strategy if time runs short}
+
+\begin{itemize}
+  \item \textbf{Deprioritize:} Python data-flow in Hydrologist; incremental update; semantic index; polishing domain clustering. These are stretch or post-MVP.
+  \item \textbf{Ensure:} CODEBASE.md and onboarding\_brief.md generated from existing Surveyor + Hydrologist output (even without full Semanticist); at least \texttt{trace\_lineage} and \texttt{blast\_radius} in Navigator; two target codebases with artifacts; video demo covering cold start, lineage query, blast radius, Day-One brief, and living-context injection (or self-audit) per rubric.
+  \item \textbf{Minimum viable:} If Semanticist is incomplete, Archivist can still produce a CODEBASE.md from module graph + lineage graph + static summaries (no LLM purpose statements); Day-One brief can be partially filled from RECONNAISSANCE-style manual answers plus automated lineage/sources/sinks.
+\end{itemize}
+
+The plan is plausibly achievable within the remaining time if critical path is prioritized and fallbacks are used for stretch items.
+
+\vspace{1em}
+\hrule
+\vspace{0.5em}
+\footnotesize
+This interim report is the single PDF content required for the interim submission (RECONNAISSANCE content, architecture diagram, progress summary, early accuracy, known gaps and plan).
+
+\end{document}
