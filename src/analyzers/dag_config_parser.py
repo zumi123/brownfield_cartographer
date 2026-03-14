@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import pathlib
-from typing import Any
+from typing import Any, Optional
 
 from ..models.schema import TransformationNode
 
@@ -103,16 +103,22 @@ class DAGConfigAnalyzer:
                             )
         return nodes
 
-    def run(self) -> list[TransformationNode]:
-        """Scan YAML files and return transformation nodes from dbt/Airflow config."""
+    def run(self, changed_paths: Optional[set[str]] = None) -> list[TransformationNode]:
+        """Scan YAML files (or only changed_paths) and return transformation nodes."""
         out: list[TransformationNode] = []
         for path in self.repo_root.rglob("*.yml"):
             if ".git" in path.parts or ".cartography" in path.parts:
+                continue
+            rel = str(path.relative_to(self.repo_root))
+            if changed_paths is not None and rel not in changed_paths:
                 continue
             out.extend(self.extract_from_dbt_schema(path))
             out.extend(self.extract_from_airflow_dag(path))
         for path in self.repo_root.rglob("*.yaml"):
             if ".git" in path.parts or ".cartography" in path.parts:
+                continue
+            rel = str(path.relative_to(self.repo_root))
+            if changed_paths is not None and rel not in changed_paths:
                 continue
             out.extend(self.extract_from_dbt_schema(path))
             out.extend(self.extract_from_airflow_dag(path))

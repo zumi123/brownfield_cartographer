@@ -20,6 +20,306 @@
     {
       "id": "raw.orders",
       "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/narwhals/functions.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "file.csv",
+        "file.parquet"
+      ],
+      "target_datasets": [],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/narwhals/functions.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "file.csv",
+      "kind": "dataset"
+    },
+    {
+      "id": "file.parquet",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/narwhals/_typing.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "file.parquet"
+      ],
+      "target_datasets": [],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/narwhals/_typing.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/narwhals/stable/v2/__init__.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "file.csv",
+        "file.parquet"
+      ],
+      "target_datasets": [],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/narwhals/stable/v2/__init__.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/errors/__init__.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "test.csv"
+      ],
+      "target_datasets": [
+        "test.csv"
+      ],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/errors/__init__.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "test.csv",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/io/sql.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "postgres:///db_name"
+      ],
+      "target_datasets": [],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/io/sql.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "postgres:///db_name",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/core/generic.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "folder/subfolder/out.csv",
+        "out.csv",
+        "out.zip"
+      ],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/core/generic.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "folder/subfolder/out.csv",
+      "kind": "dataset"
+    },
+    {
+      "id": "out.csv",
+      "kind": "dataset"
+    },
+    {
+      "id": "out.zip",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/core/frame.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "df.parquet.gzip"
+      ],
+      "target_datasets": [
+        "df.parquet.gzip"
+      ],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/core/frame.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "df.parquet.gzip",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/test_common.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "doesnt_exist"
+      ],
+      "target_datasets": [],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/test_common.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "doesnt_exist",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/test_gcs.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "gs://test/test.csv"
+      ],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/test_gcs.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "gs://test/test.csv",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/test_http_headers.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "/tmp/junk.parquet",
+        "memory://fastparquet_user_agent.parquet"
+      ],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/test_http_headers.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "/tmp/junk.parquet",
+      "kind": "dataset"
+    },
+    {
+      "id": "memory://fastparquet_user_agent.parquet",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/test_parquet.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "~/file.parquet"
+      ],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/test_parquet.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "~/file.parquet",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/test_compression.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "foo.csv"
+      ],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/test_compression.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "foo.csv",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/test_fsspec.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "memory://test/test.csv",
+        "nonfsspecpath",
+        "testmem://test/test.csv"
+      ],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/test_fsspec.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "memory://test/test.csv",
+      "kind": "dataset"
+    },
+    {
+      "id": "nonfsspecpath",
+      "kind": "dataset"
+    },
+    {
+      "id": "testmem://test/test.csv",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_unsupported.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "test"
+      ],
+      "target_datasets": [],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_unsupported.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "test",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_network.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "s3://an_s3_bucket_data_doesnt_exit/not_real.csv",
+        "s3://an_s3_bucket_data_doesnt_exit/not_real.parquet"
+      ],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_network.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "s3://an_s3_bucket_data_doesnt_exit/not_real.csv",
+      "kind": "dataset"
+    },
+    {
+      "id": "s3://an_s3_bucket_data_doesnt_exit/not_real.parquet",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_compression.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "test_file.zip"
+      ],
+      "target_datasets": [],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_compression.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "test_file.zip",
+      "kind": "dataset"
+    },
+    {
+      "id": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/common/test_read_errors.py:python_data_flow",
+      "kind": "transformation",
+      "source_datasets": [
+        "foo.csv"
+      ],
+      "target_datasets": [],
+      "transformation_type": "python",
+      "source_file": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/common/test_read_errors.py",
+      "line_range": null,
+      "sql_query_if_applicable": null
     }
   ],
   "edges": [
@@ -31,6 +331,141 @@
     {
       "source": "raw.orders",
       "target": "sample_lineage/models/sample.sql",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "file.csv",
+      "target": "venv/lib/python3.13/site-packages/narwhals/functions.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "file.csv",
+      "target": "venv/lib/python3.13/site-packages/narwhals/stable/v2/__init__.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "file.parquet",
+      "target": "venv/lib/python3.13/site-packages/narwhals/functions.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "file.parquet",
+      "target": "venv/lib/python3.13/site-packages/narwhals/_typing.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "file.parquet",
+      "target": "venv/lib/python3.13/site-packages/narwhals/stable/v2/__init__.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/errors/__init__.py:python_data_flow",
+      "target": "test.csv",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "test.csv",
+      "target": "venv/lib/python3.13/site-packages/pandas/errors/__init__.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "postgres:///db_name",
+      "target": "venv/lib/python3.13/site-packages/pandas/io/sql.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/core/generic.py:python_data_flow",
+      "target": "folder/subfolder/out.csv",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/core/generic.py:python_data_flow",
+      "target": "out.csv",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/core/generic.py:python_data_flow",
+      "target": "out.zip",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/core/frame.py:python_data_flow",
+      "target": "df.parquet.gzip",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "df.parquet.gzip",
+      "target": "venv/lib/python3.13/site-packages/pandas/core/frame.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "doesnt_exist",
+      "target": "venv/lib/python3.13/site-packages/pandas/tests/io/test_common.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/test_gcs.py:python_data_flow",
+      "target": "gs://test/test.csv",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/test_http_headers.py:python_data_flow",
+      "target": "/tmp/junk.parquet",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/test_http_headers.py:python_data_flow",
+      "target": "memory://fastparquet_user_agent.parquet",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/test_parquet.py:python_data_flow",
+      "target": "~/file.parquet",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/test_compression.py:python_data_flow",
+      "target": "foo.csv",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "foo.csv",
+      "target": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/common/test_read_errors.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/test_fsspec.py:python_data_flow",
+      "target": "memory://test/test.csv",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/test_fsspec.py:python_data_flow",
+      "target": "nonfsspecpath",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/test_fsspec.py:python_data_flow",
+      "target": "testmem://test/test.csv",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "test",
+      "target": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_unsupported.py:python_data_flow",
+      "type": "CONSUMES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_network.py:python_data_flow",
+      "target": "s3://an_s3_bucket_data_doesnt_exit/not_real.csv",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_network.py:python_data_flow",
+      "target": "s3://an_s3_bucket_data_doesnt_exit/not_real.parquet",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "test_file.zip",
+      "target": "venv/lib/python3.13/site-packages/pandas/tests/io/parser/test_compression.py:python_data_flow",
       "type": "CONSUMES"
     }
   ]

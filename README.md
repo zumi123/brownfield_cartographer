@@ -12,8 +12,8 @@ flowchart TB
     S["Agent 1: Surveyor"]
     H["Agent 2: Hydrologist"]
     KG["Knowledge Graph (central)"]
-    SEM["Agent 3: Semanticist (planned)"]
-    ARCH["Agent 4: Archivist (planned)"]
+    SEM["Agent 3: Semanticist"]
+    ARCH["Agent 4: Archivist"]
     IN --> CLI --> ORCH
     ORCH --> S
     ORCH --> H
@@ -43,32 +43,67 @@ uv sync
 # or: uv pip install -e .
 ```
 
-### Run analysis
+### Run full analysis
 
-Analyze a local directory or a GitHub URL (it will be cloned into the current directory):
+Full pipeline (Surveyor → Hydrologist → Semanticist → Archivist). Use a local path or GitHub URL (cloned into current directory):
 
 ```bash
-cartographer .
-cartographer /path/to/other/repo
-cartographer https://github.com/dbt-labs/jaffle_shop
+cartographer analyze .
+cartographer analyze /path/to/repo
+cartographer analyze https://github.com/dbt-labs/jaffle_shop
+cartographer analyze . --incremental   # re-analyze only changed files since last run
 ```
 
-This creates a **`.cartography/`** folder inside the target repo with:
+**Artifacts in `.cartography/`:**
 
-- **`module_graph.json`** — nodes (files), edges (imports), and PageRank.
-- **`lineage_graph.json`** — datasets and transformations from `.sql` and dbt/Airflow-style YAML.
+- **`module_graph.json`** — modules, import edges, PageRank, purpose_statement, domain_cluster.
+- **`lineage_graph.json`** — datasets and transformations (SQL, YAML, Python data flow).
+- **`CODEBASE.md`** — living context for AI coding agents (architecture, critical path, sources/sinks, debt, high-velocity files).
+- **`onboarding_brief.md`** — five FDE Day-One answers with evidence.
+- **`cartography_trace.jsonl`** — audit log of agent actions.
+- **`semantic_index/purpose_index.json`** — module path → purpose statement (for search).
 
-### Interim deliverables (March 12)
+**LLM (purpose statements + Day-One synthesis):**
 
-- `src/cli.py` — entry point; takes repo path (local or GitHub URL), runs analysis.
-- `src/orchestrator.py` — runs Surveyor then Hydrologist, writes `.cartography/` artifacts.
-- `src/models/` — Pydantic schemas (ModuleNode, DatasetNode, TransformationNode, EdgeTypes).
-- `src/analyzers/tree_sitter_analyzer.py` — multi-language AST parsing, LanguageRouter.
-- `src/analyzers/sql_lineage.py` — sqlglot-based SQL table dependency extraction.
-- `src/analyzers/dag_config_parser.py` — Airflow/dbt YAML config parsing.
-- `src/agents/surveyor.py` — module graph, PageRank, git velocity, dead-code candidates.
-- `src/agents/hydrologist.py` — DataLineageGraph, blast_radius, find_sources/find_sinks.
-- `src/graph/knowledge_graph.py` — NetworkX wrapper and JSON serialization.
+- **OpenRouter (free):** Sign up at [openrouter.ai](https://openrouter.ai), create an API key, then:
+  ```bash
+  export OPENROUTER_API_KEY=sk-or-v1-xxxxxxxx
+  # Optional: base URL defaults to https://openrouter.ai/api/v1
+  export OPENROUTER_API_BASE=https://openrouter.ai/api/v1
+  ```
+  The Semanticist uses **Google Gemini 2.0 Flash** on OpenRouter by default (free tier).
 
-See **RECONNAISSANCE.md** for manual Day-One analysis of the primary target and **INTERIM_REPORT.md** for architecture, progress, and known gaps.
+- **OpenAI:** `export OPENAI_API_KEY=sk-...` (uses gpt-4o-mini / gpt-4o).
+
+Without any key, stub purpose text and Day-One answers are used.
+
+### Query mode (Navigator)
+
+After analyzing a repo, run interactive queries (find_implementation, trace_lineage, blast_radius, explain_module):
+
+```bash
+cartographer query /path/to/repo
+```
+
+Then ask in natural language, e.g. “upstream of raw.customers”, “blast radius of src/orchestrator.py”, “explain src/cli.py”.
+
+### Web UI (Streamlit)
+
+A browser-based interface to run analysis, view artifacts, and run Navigator queries:
+
+```bash
+pip install -e ".[ui]"   # or: uv pip install -e ".[ui]"
+streamlit run app_ui.py
+```
+
+- **Analyze**: enter repo path or GitHub URL, optional branch and incremental; run full pipeline.
+- **Artifacts**: view CODEBASE.md, onboarding_brief.md, and graph summaries from `.cartography/`.
+- **Query**: run Navigator questions (lineage, blast radius, explain, find) from the UI.
+
+### Components
+
+- **CLI** (`src/cli.py`): `analyze` and `query` subcommands; `--incremental`, `--output-dir`, `--branch`.
+- **Orchestrator**: full pipeline; optional incremental (re-analyze changed files only).
+- **Surveyor, Hydrologist, Semanticist, Archivist, Navigator** in `src/agents/`.
+- **Models, analyzers, knowledge graph** in `src/models/`, `src/analyzers/`, `src/graph/`.
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import pathlib
 import re
-from typing import List
+from typing import List, Optional
 
 from ..models.schema import TransformationNode
 
@@ -64,10 +64,13 @@ class PythonDataFlowAnalyzer:
         )
         return nodes
 
-    def run(self) -> List[TransformationNode]:
+    def run(self, changed_paths: Optional[set[str]] = None) -> List[TransformationNode]:
         out: List[TransformationNode] = []
         for path in self.repo_root.rglob("*.py"):
             if ".git" in path.parts or ".cartography" in path.parts:
+                continue
+            rel = str(path.relative_to(self.repo_root))
+            if changed_paths is not None and rel not in changed_paths:
                 continue
             try:
                 out.extend(self.extract_from_file(path))

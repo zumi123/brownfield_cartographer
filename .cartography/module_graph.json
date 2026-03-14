@@ -1,115 +1,217 @@
 {
   "nodes": [
     {
+      "id": "app_ui.py",
+      "language": "python",
+      "pagerank": 0.052632,
+      "change_velocity_30d": 0,
+      "is_dead_code_candidate": true,
+      "purpose_statement": "Entry script: app_ui.py (skipped for LLM).",
+      "domain_cluster": "domain_0"
+    },
+    {
       "id": "src/orchestrator.py",
       "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 1,
-      "is_dead_code_candidate": false
+      "pagerank": 0.052632,
+      "change_velocity_30d": 2,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The module orchestrates a full code analysis pipeline, utilizing agents to survey, understand dependencies, extract semantics, and generate documentation. It supports incremental analysis by re-analyzing only the changed files, and it produces various code understanding artifacts such as module graphs and semantic indices.",
+      "domain_cluster": "domain_0"
     },
     {
-      "id": "src/agents/hydrologist.py",
+      "id": "src/agents/navigator.py",
       "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 1,
-      "is_dead_code_candidate": false
-    },
-    {
-      "id": "src/agents/surveyor.py",
-      "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 1,
-      "is_dead_code_candidate": false
+      "pagerank": 0.052632,
+      "change_velocity_30d": 0,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The `Navigator` module enables querying a codebase's structure and lineage using a knowledge graph. It provides tools to find implementations, trace data lineage, assess the impact of changes, and explain module purposes, citing evidence from static analysis and LLM-derived information.",
+      "domain_cluster": "domain_0"
     },
     {
       "id": "src/graph/knowledge_graph.py",
       "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 1,
-      "is_dead_code_candidate": false
+      "pagerank": 0.052632,
+      "change_velocity_30d": 2,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "This module defines the KnowledgeGraph class, which stores and manages two directed graphs: a module import graph and a data lineage graph. It provides methods to add nodes and edges to these graphs, compute pagerank, identify circular dependencies, and serialize/deserialize the module graph.",
+      "domain_cluster": "domain_2"
+    },
+    {
+      "id": "src/agents/archivist.py",
+      "language": "python",
+      "pagerank": 0.052632,
+      "change_velocity_30d": 0,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The `Archivist` class generates living artifacts like `CODEBASE.md` and `onboarding_brief.md` to document the codebase's architecture and answer key onboarding questions. It also maintains a trace log of actions taken during the cartography process for auditing and debugging.",
+      "domain_cluster": "domain_0"
+    },
+    {
+      "id": "src/agents/hydrologist.py",
+      "language": "python",
+      "pagerank": 0.052632,
+      "change_velocity_30d": 2,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The module performs data flow and lineage analysis on a code repository. It extracts data transformations from SQL, DAG configuration files, and Python code to build a knowledge graph representing data dependencies.",
+      "domain_cluster": "domain_0"
+    },
+    {
+      "id": "src/agents/semanticist.py",
+      "language": "python",
+      "pagerank": 0.052632,
+      "change_velocity_30d": 0,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The `semanticist` module leverages LLMs to extract purpose statements from code, cluster code into domains, and answer high-level \"Day-One\" questions about the code base. It intelligently manages API usage by tracking token consumption and falling back to stubs when an API key is unavailable.",
+      "domain_cluster": "domain_0"
+    },
+    {
+      "id": "src/agents/surveyor.py",
+      "language": "python",
+      "pagerank": 0.052632,
+      "change_velocity_30d": 2,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The `Surveyor` analyzes Python code in a Git repository to build a module import graph. It identifies potential dead code, calculates change velocity using Git history, and stores this information in a knowledge graph.",
+      "domain_cluster": "domain_0"
     },
     {
       "id": "src/cli.py",
       "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 1,
-      "is_dead_code_candidate": true
+      "pagerank": 0.052632,
+      "change_velocity_30d": 2,
+      "is_dead_code_candidate": true,
+      "purpose_statement": "The module defines a command-line interface for the Brownfield Cartographer tool. It allows users to analyze a codebase and subsequently query the generated Cartography artifacts.",
+      "domain_cluster": "domain_2"
     },
     {
       "id": "src/__init__.py",
       "language": "python",
-      "pagerank": 0.066667,
+      "pagerank": 0.052632,
       "change_velocity_30d": 1,
-      "is_dead_code_candidate": false
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The `src` module serves as the root package for the Brownfield Cartographer application. It likely organizes and encapsulates the application's submodules and functionalities related to mapping and managing brownfield sites.",
+      "domain_cluster": "domain_2"
     },
     {
       "id": "src/analyzers/tree_sitter_analyzer.py",
       "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 1,
-      "is_dead_code_candidate": false
+      "pagerank": 0.052632,
+      "change_velocity_30d": 2,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The module provides language-agnostic AST parsing using tree-sitter to extract information from source code files. Specifically, it extracts imports and public symbols (functions, classes) from Python files.",
+      "domain_cluster": "domain_5"
     },
     {
       "id": "src/models/schema.py",
       "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 1,
-      "is_dead_code_candidate": false
+      "pagerank": 0.052632,
+      "change_velocity_30d": 2,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "This module defines the schema for representing code artifacts, datasets, and their relationships in a data lineage graph. It includes Pydantic models for different node types (modules, datasets, functions, transformations) and edge types representing dependencies between them.",
+      "domain_cluster": "domain_2"
     },
     {
       "id": "src/agents/__init__.py",
       "language": "python",
-      "pagerank": 0.066667,
+      "pagerank": 0.052632,
       "change_velocity_30d": 1,
-      "is_dead_code_candidate": true
+      "is_dead_code_candidate": true,
+      "purpose_statement": "This module exposes a collection of agent classes. These agents appear to be specialized for tasks like content archiving, hydrological analysis, navigation, semantic understanding, and surveying.",
+      "domain_cluster": "domain_0"
     },
     {
       "id": "src/analyzers/dag_config_parser.py",
       "language": "python",
-      "pagerank": 0.066667,
+      "pagerank": 0.052632,
       "change_velocity_30d": 1,
-      "is_dead_code_candidate": false
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The module parses Airflow DAG and dbt schema YAML files to extract pipeline topology and model/table references. It identifies dependencies and creates transformation nodes representing the data pipeline's structure.",
+      "domain_cluster": "domain_3"
     },
     {
       "id": "src/analyzers/python_data_flow.py",
       "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 0,
-      "is_dead_code_candidate": false
+      "pagerank": 0.052632,
+      "change_velocity_30d": 1,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The module analyzes Python code to extract data flow information. It identifies read and write operations on datasets (files, tables) based on regular expression patterns.",
+      "domain_cluster": "domain_5"
     },
     {
       "id": "src/analyzers/sql_lineage.py",
       "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 1,
-      "is_dead_code_candidate": false
+      "pagerank": 0.052632,
+      "change_velocity_30d": 2,
+      "is_dead_code_candidate": false,
+      "purpose_statement": "The module extracts data lineage from SQL files by parsing them and identifying source and target tables. It supports various SQL dialects (PostgreSQL, BigQuery, Snowflake, DuckDB) and handles dbt `ref()` calls.",
+      "domain_cluster": "domain_5"
     },
     {
       "id": "src/graph/__init__.py",
       "language": "python",
-      "pagerank": 0.066667,
+      "pagerank": 0.052632,
       "change_velocity_30d": 1,
-      "is_dead_code_candidate": true
+      "is_dead_code_candidate": true,
+      "purpose_statement": "The module defines the graph subpackage. It exposes the `KnowledgeGraph` class, likely representing a knowledge graph data structure.",
+      "domain_cluster": "domain_2"
     },
     {
       "id": "src/analyzers/__init__.py",
       "language": "python",
-      "pagerank": 0.066667,
-      "change_velocity_30d": 1,
-      "is_dead_code_candidate": true
+      "pagerank": 0.052632,
+      "change_velocity_30d": 2,
+      "is_dead_code_candidate": true,
+      "purpose_statement": "The module exposes several code analyzers. These analyzers are used for static code analysis, including DAG configuration parsing, Python data flow analysis, SQL lineage extraction, and generic code analysis using Tree-sitter.",
+      "domain_cluster": "domain_5"
     },
     {
       "id": "src/models/__init__.py",
       "language": "python",
-      "pagerank": 0.066667,
+      "pagerank": 0.052632,
       "change_velocity_30d": 1,
-      "is_dead_code_candidate": true
+      "is_dead_code_candidate": true,
+      "purpose_statement": "This module defines the data structures (schemas) for representing nodes and edges in a computational graph. It includes node types such as datasets, functions, modules, and transformations, as well as edge types and storage types.",
+      "domain_cluster": "domain_2"
     }
   ],
   "edges": [
     {
+      "source": "app_ui.py",
+      "target": "src/orchestrator.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "app_ui.py",
+      "target": "src/agents/navigator.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "app_ui.py",
+      "target": "src/graph/knowledge_graph.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/orchestrator.py",
+      "target": "src/agents/archivist.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
       "source": "src/orchestrator.py",
       "target": "src/agents/hydrologist.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/orchestrator.py",
+      "target": "src/agents/navigator.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/orchestrator.py",
+      "target": "src/agents/semanticist.py",
       "type": "IMPORTS",
       "weight": 1
     },
@@ -121,6 +223,24 @@
     },
     {
       "source": "src/orchestrator.py",
+      "target": "src/graph/knowledge_graph.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/navigator.py",
+      "target": "src/graph/knowledge_graph.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/graph/knowledge_graph.py",
+      "target": "src/models/schema.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/archivist.py",
       "target": "src/graph/knowledge_graph.py",
       "type": "IMPORTS",
       "weight": 1
@@ -150,6 +270,12 @@
       "weight": 1
     },
     {
+      "source": "src/agents/semanticist.py",
+      "target": "src/graph/knowledge_graph.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
       "source": "src/agents/surveyor.py",
       "target": "src/analyzers/tree_sitter_analyzer.py",
       "type": "IMPORTS",
@@ -168,12 +294,6 @@
       "weight": 1
     },
     {
-      "source": "src/graph/knowledge_graph.py",
-      "target": "src/models/schema.py",
-      "type": "IMPORTS",
-      "weight": 1
-    },
-    {
       "source": "src/cli.py",
       "target": "src/orchestrator.py",
       "type": "IMPORTS",
@@ -181,7 +301,25 @@
     },
     {
       "source": "src/agents/__init__.py",
+      "target": "src/agents/archivist.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/__init__.py",
       "target": "src/agents/hydrologist.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/__init__.py",
+      "target": "src/agents/navigator.py",
+      "type": "IMPORTS",
+      "weight": 1
+    },
+    {
+      "source": "src/agents/__init__.py",
+      "target": "src/agents/semanticist.py",
       "type": "IMPORTS",
       "weight": 1
     },
@@ -248,14 +386,14 @@
   ],
   "high_velocity_files": [
     "src/orchestrator.py",
+    "src/graph/knowledge_graph.py",
     "src/agents/hydrologist.py",
     "src/agents/surveyor.py",
-    "src/graph/knowledge_graph.py",
     "src/cli.py",
-    "src/__init__.py",
     "src/analyzers/tree_sitter_analyzer.py",
     "src/models/schema.py",
-    "src/agents/__init__.py",
-    "src/analyzers/dag_config_parser.py"
+    "src/analyzers/sql_lineage.py",
+    "src/analyzers/__init__.py",
+    "src/__init__.py"
   ]
 }

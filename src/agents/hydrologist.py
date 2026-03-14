@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pathlib
+from typing import Optional, Set
 
 from ..analyzers.dag_config_parser import DAGConfigAnalyzer
 from ..analyzers.python_data_flow import PythonDataFlowAnalyzer
@@ -22,12 +23,12 @@ class Hydrologist:
         self.dag_analyzer = DAGConfigAnalyzer(repo_root)
         self.python_flow_analyzer = PythonDataFlowAnalyzer(repo_root)
 
-    def run(self) -> None:
-        for t in self.sql_analyzer.run():
+    def run(self, changed_paths: Optional[Set[str]] = None) -> None:
+        for t in self.sql_analyzer.run(changed_paths=changed_paths):
             self.kg.add_transformation(t)
-        for t in self.dag_analyzer.run():
+        for t in self.dag_analyzer.run(changed_paths=changed_paths):
             self.kg.add_transformation(t)
-        for t in self.python_flow_analyzer.run():
+        for t in self.python_flow_analyzer.run(changed_paths=changed_paths):
             self.kg.add_transformation(t)
 
     def blast_radius(self, node_id: str, direction: str = "downstream") -> list[str]:

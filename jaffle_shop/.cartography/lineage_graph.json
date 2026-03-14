@@ -1,0 +1,132 @@
+{
+  "nodes": [
+    {
+      "id": "dbt_project.yml:jaffle_shop",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "jaffle_shop"
+      ],
+      "transformation_type": "config",
+      "source_file": "dbt_project.yml",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "jaffle_shop",
+      "kind": "dataset"
+    },
+    {
+      "id": "models/schema.yml:customers",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "customers"
+      ],
+      "transformation_type": "config",
+      "source_file": "models/schema.yml",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "customers",
+      "kind": "dataset"
+    },
+    {
+      "id": "models/schema.yml:orders",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "orders"
+      ],
+      "transformation_type": "config",
+      "source_file": "models/schema.yml",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "orders",
+      "kind": "dataset"
+    },
+    {
+      "id": "models/staging/schema.yml:stg_customers",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "stg_customers"
+      ],
+      "transformation_type": "config",
+      "source_file": "models/staging/schema.yml",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "stg_customers",
+      "kind": "dataset"
+    },
+    {
+      "id": "models/staging/schema.yml:stg_orders",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "stg_orders"
+      ],
+      "transformation_type": "config",
+      "source_file": "models/staging/schema.yml",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "stg_orders",
+      "kind": "dataset"
+    },
+    {
+      "id": "models/staging/schema.yml:stg_payments",
+      "kind": "transformation",
+      "source_datasets": [],
+      "target_datasets": [
+        "stg_payments"
+      ],
+      "transformation_type": "config",
+      "source_file": "models/staging/schema.yml",
+      "line_range": null,
+      "sql_query_if_applicable": null
+    },
+    {
+      "id": "stg_payments",
+      "kind": "dataset"
+    }
+  ],
+  "edges": [
+    {
+      "source": "dbt_project.yml:jaffle_shop",
+      "target": "jaffle_shop",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "models/schema.yml:customers",
+      "target": "customers",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "models/schema.yml:orders",
+      "target": "orders",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "models/staging/schema.yml:stg_customers",
+      "target": "stg_customers",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "models/staging/schema.yml:stg_orders",
+      "target": "stg_orders",
+      "type": "PRODUCES"
+    },
+    {
+      "source": "models/staging/schema.yml:stg_payments",
+      "target": "stg_payments",
+      "type": "PRODUCES"
+    }
+  ]
+}

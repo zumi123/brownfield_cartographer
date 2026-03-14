@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import pathlib
-from typing import Set
+from typing import Optional, Set
 
 from git import Repo
 
@@ -26,11 +26,13 @@ class Surveyor:
         self.kg = knowledge_graph
         self.analyzer = TreeSitterAnalyzer(self.repo_root)
 
-    def run(self) -> None:
+    def run(self, changed_paths: Optional[Set[str]] = None) -> None:
         all_modules: Set[str] = set()
         for path in self.analyzer.iter_python_files():
+            rel = str(path.relative_to(self.repo_root))
+            if changed_paths is not None and rel not in changed_paths:
+                continue
             try:
-                rel = str(path.relative_to(self.repo_root))
                 self.kg.add_module(path=rel, language="python")
                 all_modules.add(rel)
                 for mod_name, is_relative in self.analyzer.extract_python_imports(path):

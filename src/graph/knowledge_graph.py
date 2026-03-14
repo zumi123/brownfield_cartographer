@@ -63,16 +63,20 @@ class KnowledgeGraph:
     def to_module_graph_dict(self) -> Dict[str, List]:
         """JSON-serializable module graph with pagerank and analytical metadata."""
         pr = self.pagerank_modules()
-        nodes = [
-            {
+        nodes = []
+        for n in self.module_graph.nodes:
+            nd = {
                 "id": n,
                 "language": self.module_graph.nodes[n].get("language"),
                 "pagerank": round(pr.get(n, 0.0), 6),
                 "change_velocity_30d": self.module_graph.nodes[n].get("change_velocity_30d"),
                 "is_dead_code_candidate": self.module_graph.nodes[n].get("is_dead_code_candidate", False),
             }
-            for n in self.module_graph.nodes
-        ]
+            if self.module_graph.nodes[n].get("purpose_statement") is not None:
+                nd["purpose_statement"] = self.module_graph.nodes[n]["purpose_statement"]
+            if self.module_graph.nodes[n].get("domain_cluster") is not None:
+                nd["domain_cluster"] = self.module_graph.nodes[n]["domain_cluster"]
+            nodes.append(nd)
         edges = [
             {"source": u, "target": v, "type": EdgeTypes.IMPORTS.value, "weight": self.module_graph.edges[u, v].get("weight", 1)}
             for u, v in self.module_graph.edges
@@ -90,12 +94,16 @@ class KnowledgeGraph:
         for node in data.get("nodes") or []:
             nid = node.get("id") or node.get("path")
             if nid:
-                self.module_graph.add_node(
-                    nid,
-                    language=node.get("language", "python"),
-                    change_velocity_30d=node.get("change_velocity_30d"),
-                    is_dead_code_candidate=node.get("is_dead_code_candidate", False),
-                )
+                attrs = {
+                    "language": node.get("language", "python"),
+                    "change_velocity_30d": node.get("change_velocity_30d"),
+                    "is_dead_code_candidate": node.get("is_dead_code_candidate", False),
+                }
+                if node.get("purpose_statement") is not None:
+                    attrs["purpose_statement"] = node["purpose_statement"]
+                if node.get("domain_cluster") is not None:
+                    attrs["domain_cluster"] = node["domain_cluster"]
+                self.module_graph.add_node(nid, **attrs)
         for edge in data.get("edges") or []:
             u, v = edge.get("source"), edge.get("target")
             if u and v:

@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import re
 import pathlib
-from typing import Any
+from typing import Any, Optional
 
 import sqlglot
 from sqlglot import exp
@@ -151,11 +151,14 @@ class SQLLineageAnalyzer:
             parts.append(table.name)
         return ".".join(parts) if parts else None
 
-    def run(self) -> list[TransformationNode]:
-        """Scan repo for .sql files and return all transformation nodes."""
+    def run(self, changed_paths: Optional[set[str]] = None) -> list[TransformationNode]:
+        """Scan repo for .sql files (or only changed_paths) and return transformation nodes."""
         out: list[TransformationNode] = []
         for path in self.repo_root.rglob("*.sql"):
             if ".git" in path.parts or ".cartography" in path.parts:
+                continue
+            rel = str(path.relative_to(self.repo_root))
+            if changed_paths is not None and rel not in changed_paths:
                 continue
             out.extend(self.extract_from_file(path))
         return out
